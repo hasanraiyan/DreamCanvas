@@ -245,12 +245,16 @@ function App() {
           return `Generating images: ${Math.round(generationState.progress)}%`;
         case 'completed':
           const timeTaken = (
-            (generationState.endTime - generationState.startTime) /
-            1000
+            (generationState.endTime - generationState.startTime) / 1000
           ).toFixed(1);
           return `Generation completed in ${timeTaken}s`;
         case 'failed':
-          return `Generation failed: ${generationState.error}`;
+          return (
+            <>
+              <p className="text-red-600">Generation failed: {generationState.error}</p>
+              <p className="text-gray-600">Please try again.</p>
+            </>
+          );
         default:
           return '';
       }
@@ -271,54 +275,46 @@ function App() {
     );
   };
 
+
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen`}>
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 transition-colors duration-200">
-        <ToastContainer theme={darkMode ? 'dark' : 'light'} />
+        <ToastContainer />
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2">
               <ImageIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
                 Dream Canvas
               </h1>
             </div>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
-            >
-              {darkMode ? (
-                <Sun className="text-yellow-400" />
-              ) : (
-                <Moon className="text-gray-700" />
-              )}
-            </button>
+
           </div>
           <p className="text-gray-600 dark:text-gray-300 text-center mb-8">
             Transform your imagination into stunning visuals
           </p>
 
           <div className="max-w-3xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="text"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe your imagination..."
-                  className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                />
-                <motion.button
-                  onClick={generateImages}
-                  disabled={!prompt || isLoading}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-50"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Sparkles className="w-5 h-5" />
-                  {isLoading ? 'Generating...' : 'Generate'}
-                </motion.button>
-              </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+  <input
+    type="text"
+    value={prompt}
+    onChange={(e) => setPrompt(e.target.value)}
+    placeholder="Describe your imagination..."
+    className="w-full md:w-3/4 p-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+  />
+  <motion.button
+    onClick={generateImages}
+    disabled={!prompt || isLoading}
+    className="w-full md:w-1/4 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <Sparkles className="w-5 h-5" />
+    {isLoading ? 'Generating...' : 'Generate'}
+  </motion.button>
+</div>
 
               <AdvancedSettings
                 settings={settings}
@@ -330,53 +326,52 @@ function App() {
 
             {renderGenerationStatus()}
 
-            <AnimatePresence>
-              <motion.div
-                className="grid grid-cols-2 gap-4 mt-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {imageItems.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="relative group aspect-square"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    {item.status === 'loading' ? (
-                      <ImageSkeleton />
-                    ) : item.status === 'error' ? (
-                      <div className="bg-red-100 dark:bg-red-900 p-4 rounded-lg text-red-500 dark:text-red-300 h-full flex items-center justify-center">
-                        Failed to load image
-                      </div>
-                    ) : (
-                      <img
-                        src={item.url}
-                        alt={`Generated artwork ${index + 1}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    )}
-                    {item && (
-                      <ImageDialog
-                        image={item}
-                        prompt={prompt}
-                        settings={settings}
-                        // metadata={item.metadata}
-                        onDownload={handleDownload}
-                      />
-                    )}
-                  </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+            <div className="mt-6">
+              {imageItems.length > 0 && (
+                <div className="mt-4 p-4 flex overflow-x-auto space-x-4">
+                  {imageItems.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="relative bg-gray-100 rounded-lg shadow-md overflow-hidden min-w-[200px] max-w-[300px] w-full flex-shrink-0 p-2 m-2"
+                    >
+                      {item.status === 'loading' && <ImageSkeleton />}
+                      {item.status === 'loaded' && (
+                        <>
+                          <img
+                            src={item.url}
+                            alt={`Generated image ${index + 1}`}
+                            className="w-full h-auto"
+                          />
+                          <div className="absolute top-2 right-2">
+                            <button
+                              onClick={() => handleDownload(item.url)}
+                              className="bg-white rounded-full p-2 shadow-md hover:shadow-lg transition"
+                            >
+                              <RefreshCw className="w-4 h-4 text-indigo-600" />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                      {item.status === 'error' && (
+                        <div className="flex justify-center items-center h-full">
+                          <p className="text-red-500">Failed to load</p>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {images.length > 0 && (
               <div className="mt-6 text-center">
                 <motion.button
                   onClick={regenerateImages}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center gap-2"
+                  className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center justify-center gap-2"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
