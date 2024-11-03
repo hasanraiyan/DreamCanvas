@@ -28,7 +28,7 @@ export function AdvancedSettings({
   const { models, isLoading, error } = useModels()
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg p-6">
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
         className="w-full flex items-center justify-between text-sm font-medium text-gray-700 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md p-2"
