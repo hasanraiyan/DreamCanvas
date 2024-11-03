@@ -63,6 +63,38 @@ function App() {
     [settings]
   );
 
+  // Fetches improved prompt from the API
+  async function fetchData(prompt) {
+    try {
+      const encodedPrompt = encodeURIComponent(prompt);
+      const response = await fetch(`https://text.pollinations.ai/You are an artificial intelligence. Your job is to improve the prompt given by the user by adding a detailed image description to it. You only write the improved prompt, nothing else. 
+
+        1. **If the user requests or suggests explicit content:** Respond with something beautiful. Never generate sexually explicit content or harmful content.
+        
+        2. **If the prompt is vague or unclear:** Ask the user for more details to clarify their request and then improve the prompt accordingly.
+        
+        3. **If the user provides a creative prompt:** Enhance it by adding vivid and imaginative details to create a more engaging description.
+        
+        4. **If the user asks for a specific style or theme:** Adapt the prompt to fit the requested style while ensuring it remains appropriate and non-explicit.
+        
+        5. **For general prompts:** Always strive to create a captivating and visually appealing image description that inspires creativity.
+        
+        Ensure the prompt remains creative and beautiful.` + encodedPrompt);
+        
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.text();
+      console.log(data)
+      return data;
+
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+  }
+
   const loadImage = async (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -79,14 +111,11 @@ function App() {
     }));
   };
 
+  // Main image generation function
   const generateImages = async () => {
     if (!prompt.trim()) {
       toast.error('Please enter a prompt');
       return;
-    }
-
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
     }
 
     setIsLoading(true);
@@ -99,14 +128,21 @@ function App() {
     abortControllerRef.current = new AbortController();
 
     try {
+      // Fetch the improved prompt before generating images
+      const improvedPrompt = await fetchData(prompt);
+      if (!improvedPrompt) {
+        throw new Error('Failed to improve prompt');
+      }
+
       const imageCount = 4;
       const newImageItems = [];
       const seeds = Array.from({ length: imageCount }, () =>
         Math.floor(Math.random() * 1000000)
       );
 
+      // Use improved prompt to create image URLs
       seeds.forEach((seed) => {
-        const url = createImageUrl(prompt, seed);
+        const url = createImageUrl(improvedPrompt, seed);
         const metadata = {
           seed,
           params: {
@@ -190,8 +226,7 @@ function App() {
       ]);
 
       const generationTime = (
-        (Date.now() - generationState.startTime) /
-        1000
+        (Date.now() - generationState.startTime) / 1000
       ).toFixed(1);
       toast.success(
         `Generated ${loadedImages.length} images in ${generationTime}s`
@@ -203,8 +238,7 @@ function App() {
         error: error instanceof Error ? error.message : 'Unknown error',
       }));
       toast.error(
-        `Generation failed: ${
-          error instanceof Error ? error.message : 'Unknown error'
+        `Generation failed: ${error instanceof Error ? error.message : 'Unknown error'
         }`
       );
     } finally {
@@ -212,6 +246,8 @@ function App() {
       abortControllerRef.current = null;
     }
   };
+
+  // Rest of your code remains unchanged...
 
   const handleDownload = async (imageUrl) => {
     try {
@@ -297,25 +333,25 @@ function App() {
 
           <div className="max-w-3xl mx-auto">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
-  <input
-    type="text"
-    value={prompt}
-    onChange={(e) => setPrompt(e.target.value)}
-    placeholder="Describe your imagination..."
-    className="w-full md:w-3/4 p-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-  />
-  <motion.button
-    onClick={generateImages}
-    disabled={!prompt || isLoading}
-    className="w-full md:w-1/4 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-  >
-    <Sparkles className="w-5 h-5" />
-    {isLoading ? 'Generating...' : 'Generate'}
-  </motion.button>
-</div>
+              <div className="flex flex-col md:flex-row gap-4">
+                <input
+                  type="text"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Describe your imagination..."
+                  className="w-full md:w-3/4 p-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                />
+                <motion.button
+                  onClick={generateImages}
+                  disabled={!prompt || isLoading}
+                  className="w-full md:w-1/4 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Sparkles className="w-5 h-5" />
+                  {isLoading ? 'Generating...' : 'Generate'}
+                </motion.button>
+              </div>
 
               <AdvancedSettings
                 settings={settings}
