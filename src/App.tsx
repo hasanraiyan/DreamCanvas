@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ImageIcon, RefreshCw, Sparkles, Moon, Sun } from 'lucide-react';
 import { AdvancedSettings } from './components/AdvancedSettings';
@@ -25,7 +26,7 @@ function App() {
     height: 512,
     seed: Math.floor(Math.random() * 1000000),
     enhance: true,
-    model: 'flux-anime',
+    model: 'flux-realism',
     nologo: true,
     private: true,
   });
