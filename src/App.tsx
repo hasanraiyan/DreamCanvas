@@ -1,9 +1,8 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { ImageIcon, RefreshCw, Sparkles, Moon, Sun } from 'lucide-react';
+import { ImageIcon, RefreshCw, Sparkles, Moon, Sun, X } from 'lucide-react';
 import { AdvancedSettings } from './components/AdvancedSettings';
 import { ImageSkeleton } from './components/ImageSkeleton';
-import { ImageDialog } from './components/ImageDialog';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,6 +30,7 @@ function App() {
     private: true,
   });
   const [darkMode, setDarkMode] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null); // State for the selected image
 
   // Refs
   const abortControllerRef = useRef(null);
@@ -55,13 +55,21 @@ function App() {
         nologo: settings.nologo.toString(),
         private: settings.private.toString(),
       });
-
-      return `https://image.pollinations.ai/prompt/${encodeURIComponent(
+      let finalUrl=`https://image.pollinations.ai/prompt/${encodeURIComponent(
         promptText
       )}?${params}`;
+      console.log(finalUrl)
+      return finalUrl ;
     },
     [settings]
   );
+  const handleImageClick = (url) => {
+    setSelectedImage(url); // Set the selected image URL to display in the modal
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null); // Close the modal
+  };
 
   // Fetches improved prompt from the API
   async function fetchData(prompt) {
@@ -77,10 +85,12 @@ function App() {
         
         4. **If the user asks for a specific style or theme:** Adapt the prompt to fit the requested style while ensuring it remains appropriate and non-explicit.
         
-        5. **For general prompts:** Always strive to create a captivating and visually appealing image description that inspires creativity.
+        5. **For general prompts:** always make a image description.
+
+     
         
         Ensure the prompt remains creative and beautiful.` + encodedPrompt);
-        
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -332,8 +342,8 @@ function App() {
           </p>
 
           <div className="max-w-3xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6">
-              <div className="flex flex-col md:flex-row gap-4">
+            <div className=" rounded-xl  p-4 sm:p-6 mb-6">
+              <div className="flex flex-col md:flex-row gap-4 mb-4 md:mb-0">
                 <input
                   type="text"
                   value={prompt}
@@ -363,46 +373,63 @@ function App() {
 
             {renderGenerationStatus()}
 
-            <div className="mt-6">
-              {imageItems.length > 0 && (
-                <div className="mt-4 p-4 flex overflow-x-auto space-x-4">
-                  {imageItems.map((item, index) => (
-                    <motion.div
-                      key={index}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="relative bg-gray-100 rounded-lg shadow-md overflow-hidden min-w-[200px] max-w-[300px] w-full flex-shrink-0 p-2 m-2"
-                    >
-                      {item.status === 'loading' && <ImageSkeleton />}
-                      {item.status === 'loaded' && (
-                        <>
-                          <img
-                            src={item.url}
-                            alt={`Generated image ${index + 1}`}
-                            className="w-full h-auto"
-                          />
-                          <div className="absolute top-2 right-2">
-                            <button
-                              onClick={() => handleDownload(item.url)}
-                              className="bg-white rounded-full p-2 shadow-md hover:shadow-lg transition"
-                            >
-                              <RefreshCw className="w-4 h-4 text-indigo-600" />
-                            </button>
-                          </div>
-                        </>
-                      )}
-                      {item.status === 'error' && (
-                        <div className="flex justify-center items-center h-full">
-                          <p className="text-red-500">Failed to load</p>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+            <div className="mt-6 flex flex-row overflow-x-auto">
+              {imageItems.map((item, index) => (
+                <motion.div
+                  key={index}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="relative bg-gray-100 rounded-lg shadow-md overflow-hidden min-w-[200px] max-w-[300px] w-full flex-shrink-0 p-4 m-2"
+                >
+                  {item.status === 'loading' && <ImageSkeleton />}
+                  {item.status === 'loaded' && (
+                    <>
+                      <img
+                        src={item.url}
+                        alt={`Generated image ${index + 1}`}
+                        className="w-full h-auto rounded-md cursor-pointer"
+                        onClick={() => handleImageClick(item.url)} // Add onClick handler
+                      />
+                      <div className="absolute top-2 right-2">
+                        <button
+                          onClick={() => handleDownload(item.url)}
+                          className="bg-white rounded-full p-2 shadow-md hover:shadow-lg transition"
+                        >
+                          <RefreshCw className="w-4 h-4 text-indigo-600" />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                  {item.status === 'error' && (
+                    <div className="flex justify-center items-center h-full">
+                      <p className="text-red-500">Failed to load</p>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+
             </div>
+           
+            {selectedImage && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+    <div className="relative">
+      <button
+        onClick={closeModal}
+        className="absolute top-4 right-4 text-red-500 hover:text-red-400 transition"
+      >
+        <X className="w-6 h-6" />
+      </button>
+      <img
+        src={selectedImage}
+        alt="Selected"
+        className="max-w-[90vw] max-h-[90vh] object-contain" // Adjust max width and height
+      />
+    </div>
+  </div>
+)}
+
 
             {images.length > 0 && (
               <div className="mt-6 text-center">
