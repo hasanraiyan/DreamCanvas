@@ -14,7 +14,7 @@ export function useModels() {
         setModels(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load models');
-        setModels(['flux-anime']);
+        setModels(['flux-realism']);
       } finally {
         setIsLoading(false);
       }
