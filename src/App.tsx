@@ -55,11 +55,11 @@ function App() {
         nologo: settings.nologo.toString(),
         private: settings.private.toString(),
       });
-      let finalUrl=`https://image.pollinations.ai/prompt/${encodeURIComponent(
+      let finalUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(
         promptText
       )}?${params}`;
       console.log(finalUrl)
-      return finalUrl ;
+      return finalUrl;
     },
     [settings]
   );
@@ -86,6 +86,8 @@ function App() {
         4. **If the user asks for a specific style or theme:** Adapt the prompt to fit the requested style while ensuring it remains appropriate and non-explicit.
         
         5. **For general prompts:** always make a image description.
+
+        6. **For every time:** never ask user any question you work is to give the prompt to generate the image.
 
      
         
@@ -327,18 +329,18 @@ function App() {
     <div className={`min-h-screen`}>
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 transition-colors duration-200">
         <ToastContainer />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
+        <div className="container  mx-auto px-4 py-8">
+          <header className="flex flex-col justify-start items-center mb-8" aria-label="Dream Canvas Header">
+            <div className="flex items-center justify-start gap-2 mb-4">
+              <ImageIcon className="w-10 h-10 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 dark:from-purple-400 dark:to-pink-300 tracking-tight text-center">
                 Dream Canvas
               </h1>
             </div>
+          </header>
 
-          </div>
-          <p className="text-gray-600 dark:text-gray-300 text-center mb-8">
-            Transform your imagination into stunning visuals
+          <p className="text-gray-600 dark:text-gray-300 text-center mb-8 font-serif italic text-lg">
+            Unleash your creativity and create mesmerizing visuals
           </p>
 
           <div className="max-w-3xl mx-auto">
@@ -411,28 +413,30 @@ function App() {
               ))}
 
             </div>
-           
-            {selectedImage && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
-    <div className="relative">
-      <button
-        onClick={closeModal}
-        className="absolute top-4 right-4 text-red-500 hover:text-red-400 transition"
-      >
-        <X className="w-6 h-6" />
-      </button>
-      <img
-        src={selectedImage}
-        alt="Selected"
-        className="max-w-[90vw] max-h-[90vh] object-contain" // Adjust max width and height
-      />
-    </div>
-  </div>
-)}
 
+            {selectedImage && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+                <div className="relative">
+                  <button
+                    onClick={closeModal}
+                    className="absolute top-4 right-4 text-red-500 hover:text-red-400 transition"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                  <img
+                    src={selectedImage}
+                    alt="Selected"
+                    className="max-w-[90vw] max-h-[90vh] object-contain" // Adjust max width and height
+                  />
+                </div>
+              </div>
+            )}
 
             {images.length > 0 && (
               <div className="mt-6 text-center">
+                <p className="text-gray-600 dark:text-gray-300 mb-2">
+                  {images.length} image{images.length > 1 ? 's' : ''} generated.
+                </p>
                 <motion.button
                   onClick={regenerateImages}
                   className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center justify-center gap-2"
@@ -444,6 +448,7 @@ function App() {
                 </motion.button>
               </div>
             )}
+
           </div>
         </div>
       </div>
