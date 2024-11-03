@@ -1,20 +1,22 @@
-import React from 'react';
-import { Settings, AlertCircle } from 'lucide-react';
-import { useModels } from '../hooks/useModels';
+'use client'
+
+import React from 'react'
+import { Settings, AlertCircle, Maximize2, Hash, Sparkles, Image, Lock, ChevronDown, ChevronUp } from 'lucide-react'
+import { useModels } from '../hooks/useModels'
 
 interface AdvancedSettingsProps {
   settings: {
-    width: number;
-    height: number;
-    seed: number;
-    enhance: boolean;
-    model: string;
-    nologo: boolean;
-    private: boolean;
-  };
-  showAdvanced: boolean;
-  setShowAdvanced: (show: boolean) => void;
-  setSettings: React.Dispatch<React.SetStateAction<typeof settings>>;
+    width: number
+    height: number
+    seed: number
+    enhance: boolean
+    model: string
+    nologo: boolean
+    private: boolean
+  }
+  showAdvanced: boolean
+  setShowAdvanced: (show: boolean) => void
+  setSettings: React.Dispatch<React.SetStateAction<typeof settings>>
 }
 
 export function AdvancedSettings({
@@ -23,70 +25,84 @@ export function AdvancedSettings({
   setShowAdvanced,
   setSettings,
 }: AdvancedSettingsProps) {
-  const { models, isLoading, error } = useModels();
+  const { models, isLoading, error } = useModels()
 
   return (
-    <div className="p-4 bg-white rounded-lg ">
+    <div className="bg-white rounded-lg shadow-md p-6">
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className="mt-4 text-gray-600 text-sm flex items-center gap-1 hover:text-indigo-600 transition-colors focus:outline-none"
+        className="w-full flex items-center justify-between text-sm font-medium text-gray-700 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md p-2"
         aria-expanded={showAdvanced}
         aria-controls="advanced-settings"
       >
-        <Settings className="w-4 h-4" />
-        {showAdvanced ? 'Hide' : 'Show'} Advanced Settings
+        <span className="flex items-center gap-3">
+          <Settings className="w-5 h-5" />
+          Advanced Settings
+        </span>
+        {showAdvanced ? (
+          <ChevronUp className="w-5 h-5" />
+        ) : (
+          <ChevronDown className="w-5 h-5" />
+        )}
       </button>
 
       {showAdvanced && (
         <div
           id="advanced-settings"
-          className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"
+          className="mt-6 space-y-6"
         >
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Width
-            </label>
-            <input
-              type="number"
-              value={settings.width}
-              onChange={(e) =>
-                setSettings((prev) => ({
-                  ...prev,
-                  width: parseInt(e.target.value),
-                }))
-              }
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-              min="64"
-              max="1024"
-              step="64"
-              aria-label="Width"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label htmlFor="width" className="flex items-center gap-3 text-sm font-medium text-gray-700">
+                <Maximize2 className="w-5 h-5" />
+                Width
+              </label>
+              <input
+                id="width"
+                type="number"
+                value={settings.width}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    width: parseInt(e.target.value),
+                  }))
+                }
+                className="w-full p-2 pl-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+                min="64"
+                max="1024"
+                step="64"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="height" className="flex items-center gap-3 text-sm font-medium text-gray-700">
+                <Maximize2 className="w-5 h-5" />
+                Height
+              </label>
+              <input
+                id="height"
+                type="number"
+                value={settings.height}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    height: parseInt(e.target.value),
+                  }))
+                }
+                className="w-full p-2 pl-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+                min="64"
+                max="1024"
+                step="64"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Height
-            </label>
-            <input
-              type="number"
-              value={settings.height}
-              onChange={(e) =>
-                setSettings((prev) => ({
-                  ...prev,
-                  height: parseInt(e.target.value),
-                }))
-              }
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-              min="64"
-              max="1024"
-              step="64"
-              aria-label="Height"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+
+          <div className="space-y-2">
+            <label htmlFor="seed" className="flex items-center gap-3 text-sm font-medium text-gray-700">
+              <Hash className="w-5 h-5" />
               Seed
             </label>
             <input
+              id="seed"
               type="number"
               value={settings.seed}
               onChange={(e) =>
@@ -95,28 +111,29 @@ export function AdvancedSettings({
                   seed: parseInt(e.target.value),
                 }))
               }
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-              aria-label="Seed"
+              className="w-full p-2 pl-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+
+          <div className="space-y-2">
+            <label htmlFor="model" className="flex items-center gap-3 text-sm font-medium text-gray-700">
+              <Settings className="w-5 h-5" />
               Model
             </label>
             {error ? (
-              <div className="flex items-center gap-2 text-amber-600 text-sm">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-3 text-amber-600 text-sm bg-amber-50 p-3 rounded-md">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <span>Using default model (flux)</span>
               </div>
             ) : (
               <select
+                id="model"
                 value={settings.model}
                 onChange={(e) =>
                   setSettings((prev) => ({ ...prev, model: e.target.value }))
                 }
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50"
+                className="w-full p-2 pl-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow disabled:bg-gray-100 disabled:text-gray-500"
                 disabled={isLoading}
-                aria-label="Model"
               >
                 {isLoading ? (
                   <option>Loading models...</option>
@@ -130,9 +147,11 @@ export function AdvancedSettings({
               </select>
             )}
           </div>
-          <div className="col-span-2 space-y-2">
-            <label className="flex items-center gap-2">
+
+          <div className="space-y-4">
+            <div className="flex items-center">
               <input
+                id="enhance"
                 type="checkbox"
                 checked={settings.enhance}
                 onChange={(e) =>
@@ -141,27 +160,31 @@ export function AdvancedSettings({
                     enhance: e.target.checked,
                   }))
                 }
-                className="rounded text-indigo-600 focus:ring-2 focus:ring-indigo-500"
-                aria-label="Enhance Image Quality"
+                className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded transition-colors"
               />
-              <span className="text-sm text-gray-700">
+              <label htmlFor="enhance" className="ml-3 flex items-center gap-3 text-sm text-gray-700">
+                <Sparkles className="w-5 h-5" />
                 Enhance Image Quality
-              </span>
-            </label>
-            <label className="flex items-center gap-2">
+              </label>
+            </div>
+            <div className="flex items-center">
               <input
+                id="nologo"
                 type="checkbox"
                 checked={settings.nologo}
                 onChange={(e) =>
                   setSettings((prev) => ({ ...prev, nologo: e.target.checked }))
                 }
-                className="rounded text-indigo-600 focus:ring-2 focus:ring-indigo-500"
-                aria-label="Remove Watermark"
+                className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded transition-colors"
               />
-              <span className="text-sm text-gray-700">Remove Watermark</span>
-            </label>
-            <label className="flex items-center gap-2">
+              <label htmlFor="nologo" className="ml-3 flex items-center gap-3 text-sm text-gray-700">
+                <Image className="w-5 h-5" />
+                Remove Watermark
+              </label>
+            </div>
+            <div className="flex items-center">
               <input
+                id="private"
                 type="checkbox"
                 checked={settings.private}
                 onChange={(e) =>
@@ -170,14 +193,16 @@ export function AdvancedSettings({
                     private: e.target.checked,
                   }))
                 }
-                className="rounded text-indigo-600 focus:ring-2 focus:ring-indigo-500"
-                aria-label="Private Generation"
+                className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded transition-colors"
               />
-              <span className="text-sm text-gray-700">Private Generation</span>
-            </label>
+              <label htmlFor="private" className="ml-3 flex items-center gap-3 text-sm text-gray-700">
+                <Lock className="w-5 h-5" />
+                Private Generation
+              </label>
+            </div>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }
