@@ -375,7 +375,7 @@ function App() {
 
             {renderGenerationStatus()}
 
-            <div className="mt-6 flex flex-row overflow-x-auto">
+            <div className="mt-6 p-4 flex flex-row overflow-x-auto">
               {imageItems.map((item, index) => (
                 <motion.div
                   key={index}
@@ -383,7 +383,7 @@ function App() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="relative bg-gray-100 rounded-lg shadow-md overflow-hidden min-w-[200px] max-w-[300px] w-full flex-shrink-0 p-4 m-2"
+                  className="relative bg-gray-100 rounded-lg shadow-md overflow-hidden min-w-[200px] max-w-[300px] w-full flex-shrink-0  m-4"
                 >
                   {item.status === 'loading' && <ImageSkeleton />}
                   {item.status === 'loaded' && (
